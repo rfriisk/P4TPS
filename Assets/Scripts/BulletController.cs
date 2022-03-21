@@ -9,7 +9,8 @@ public class BulletController : MonoBehaviour
     private GameObject bulletDecal;
 
     // Speed of the bullet
-    private float speed = 50f;
+    [SerializeField]
+    private float speed = 10000f;
     // So the bullet don´t go on forever
     private float timeToDestroy = 3f;
 

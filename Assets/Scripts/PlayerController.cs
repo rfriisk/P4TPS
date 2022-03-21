@@ -9,13 +9,15 @@ public class PlayerController : MonoBehaviour
 {
     // So it can be changed doing playmode
     [SerializeField]
-    private float playerSpeed = 2.0f;
+    private float playerSpeed = 6f;
+    [SerializeField]
+    private float sprintSpeed = 12f;
     [SerializeField]
     private float jumpHeight = 1.0f;
     [SerializeField]
-    private float gravityValue = -9.81f;
+    private float gravityValue = -10f;
     [SerializeField]
-    private float rotationSpeed = 5f;
+    private float rotationSpeed = 8f;
     [SerializeField]
     private GameObject bulletPrefab;
     [SerializeField]
@@ -33,7 +35,7 @@ public class PlayerController : MonoBehaviour
 
     private InputAction moveAction;
     private InputAction jumpAction;
-    //private InputAction lookAction;
+    private InputAction sprintAction;
     //private InputAction moveAction;
     private InputAction shootAction;
 
@@ -45,8 +47,8 @@ public class PlayerController : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         cameraTransform = Camera.main.transform;
         moveAction = playerInput.actions["Move"];
-        //lookAction = playerInput.actions["Look"];
         jumpAction = playerInput.actions["Jump"];
+        sprintAction = playerInput.actions["Sprint"];
         shootAction = playerInput.actions["Shoot"];
 
         // Locks the cursor to the game window
@@ -99,9 +101,13 @@ public class PlayerController : MonoBehaviour
         controller.Move(move * Time.deltaTime * playerSpeed);
 
         // Changes the height position of the player (Jumping)
-        if (jumpAction.triggered && groundedPlayer)
+        if (jumpAction.triggered)
         {
             playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+        }
+        if (sprintAction.triggered && groundedPlayer)
+        {
+            controller.Move(move * Time.deltaTime * sprintSpeed);
         }
 
         playerVelocity.y += gravityValue * Time.deltaTime;
