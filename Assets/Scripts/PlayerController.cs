@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float playerSpeed = 6f;
     [SerializeField]
-    private float runSpeed = 12f;
+    private float sprintSpeed = 12f;
     [SerializeField]
     private float jumpHeight = 1.0f;
     [SerializeField]
@@ -27,8 +27,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float bulletMissDistance = 25f;
 
-    private Animator animator;
-
     private CharacterController controller;
     private PlayerInput playerInput;
     private Vector3 playerVelocity;
@@ -37,7 +35,7 @@ public class PlayerController : MonoBehaviour
 
     private InputAction moveAction;
     private InputAction jumpAction;
-    private InputAction runAction;
+    private InputAction sprintAction;
     //private InputAction moveAction;
     private InputAction shootAction;
 
@@ -47,11 +45,10 @@ public class PlayerController : MonoBehaviour
         //Debug.Log("Det kører!");
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
-        animator = GetComponent<Animator>();
         cameraTransform = Camera.main.transform;
         moveAction = playerInput.actions["Move"];
         jumpAction = playerInput.actions["Jump"];
-        runAction = playerInput.actions["Sprint"];
+        sprintAction = playerInput.actions["Sprint"];
         shootAction = playerInput.actions["Shoot"];
 
         // Locks the cursor to the game window
@@ -66,22 +63,6 @@ public class PlayerController : MonoBehaviour
     private void OnDisable()
     {
         shootAction.performed += _ => ShootGun();
-    }
-
-    private void IDLE()
-    {
-        animator.SetFloat("Speed", 0f);
-    }
-
-    private void Walk()
-    {
-        animator.SetFloat("Speed", 0.5f);
-    }
-
-    private void Run()
-    {
-        playerSpeed = runSpeed;
-        animator.SetFloat("Speed", 1f);
     }
 
     // Using the Z axis to hit the center of the screen
@@ -118,12 +99,15 @@ public class PlayerController : MonoBehaviour
         move = move.x * cameraTransform.right.normalized + move.z * cameraTransform.forward.normalized;
         move.y = 0f;
         controller.Move(move * Time.deltaTime * playerSpeed);
-        Walk();
 
         // Changes the height position of the player (Jumping)
         if (jumpAction.triggered)
         {
             playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+        }
+        if (sprintAction.triggered && groundedPlayer)
+        {
+            controller.Move(move * Time.deltaTime * sprintSpeed);
         }
 
         playerVelocity.y += gravityValue * Time.deltaTime;
